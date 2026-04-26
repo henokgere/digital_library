@@ -22,59 +22,71 @@ export function BooksPage({
   returnBook: (id: number) => Promise<void>
 }) {
   return (
-    <div className="grid gap-4">
+    <div className="library-grid">
+      {books.length === 0 && (
+        <section className="library-empty-state">
+          <h2 className="library-empty-state__title">No books yet</h2>
+          <p className="library-empty-state__text">
+            Start the collection from the add book page and the catalog will fill in here.
+          </p>
+        </section>
+      )}
+
       {books.map((book) => (
-        <article key={book.id} className="rounded-3xl bg-white p-6 shadow-sm">
+        <article key={book.id} className="book-card">
           {editing?.id === book.id ? (
-            <div className="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
+            <div className="book-card__edit-grid">
               <input
                 type="text"
                 value={editing.title}
                 onChange={(e) => setEditing({ ...editing, title: e.target.value })}
-                className="rounded-2xl border border-slate-200 px-4 py-3 focus:border-blue-500 focus:outline-none"
+                className="library-input"
               />
               <input
                 type="text"
                 value={editing.author}
                 onChange={(e) => setEditing({ ...editing, author: e.target.value })}
-                className="rounded-2xl border border-slate-200 px-4 py-3 focus:border-blue-500 focus:outline-none"
+                className="library-input"
               />
-              <div className="flex flex-wrap gap-3">
+              <div className="book-card__button-row">
                 <button
                   onClick={() => updateBook(book.id, editing.title, editing.author)}
-                  className="rounded-2xl bg-green-600 px-4 py-2 text-white transition hover:bg-green-700"
+                  className="library-button library-button--blue"
                 >
                   Save
                 </button>
                 <button
                   onClick={() => setEditing(null)}
-                  className="rounded-2xl border border-slate-200 px-4 py-2 text-slate-700 transition hover:bg-slate-100"
+                  className="library-button library-button--ghost"
                 >
                   Cancel
                 </button>
               </div>
             </div>
           ) : (
-            <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
-              <div>
-                <h2 className="text-xl font-semibold text-slate-900">{book.title}</h2>
-                <p className="mt-1 text-slate-600">by {book.author}</p>
+            <div className="book-card__content">
+              <div className="book-card__meta">
+                <div className="book-card__chip">Book</div>
+                <h2 className="book-card__title">{book.title}</h2>
+                <p className="book-card__author">by {book.author}</p>
                 <p
-                  className={`mt-3 text-sm font-semibold ${
-                    book.status === 'available' ? 'text-green-600' : 'text-red-600'
+                  className={`book-card__status ${
+                    book.status === 'available'
+                      ? 'book-card__status--available'
+                      : 'book-card__status--borrowed'
                   }`}
                 >
                   {book.status === 'available' ? 'Available' : 'Borrowed'}
                 </p>
                 {book.status === 'borrowed' && book.borrowedBy && (
-                  <p className="mt-1 text-sm text-slate-500">
+                  <p className="book-card__borrowed-note">
                     Borrowed by {book.borrowedBy} on{' '}
                     {new Date(book.borrowedDate ?? '').toLocaleDateString()}
                   </p>
                 )}
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+              <div className="book-card__controls">
                 {book.status === 'available' ? (
                   <>
                     <input
@@ -82,11 +94,11 @@ export function BooksPage({
                       placeholder="Borrower name"
                       value={borrowUser}
                       onChange={(e) => setBorrowUser(e.target.value)}
-                      className="rounded-2xl border border-slate-200 px-4 py-3 focus:border-blue-500 focus:outline-none"
+                      className="library-input"
                     />
                     <button
                       onClick={() => borrowBook(book.id, borrowUser)}
-                      className="rounded-2xl bg-blue-600 px-4 py-3 text-white transition hover:bg-blue-700"
+                      className="library-button library-button--blue"
                     >
                       Borrow
                     </button>
@@ -94,22 +106,22 @@ export function BooksPage({
                 ) : (
                   <button
                     onClick={() => returnBook(book.id)}
-                    className="rounded-2xl bg-green-600 px-4 py-3 text-white transition hover:bg-green-700"
+                    className="library-button library-button--blue"
                   >
                     Return
                   </button>
                 )}
-                <div className="flex flex-wrap gap-3">
+                <div className="book-card__button-row">
                   <button
                     onClick={() => setEditing(book)}
-                    className="rounded-2xl bg-yellow-500 px-4 py-3 text-white transition hover:bg-yellow-600"
+                    className="library-button library-button--cream"
                     disabled={book.status === 'borrowed'}
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => deleteBook(book.id)}
-                    className="rounded-2xl bg-red-500 px-4 py-3 text-white transition hover:bg-red-600"
+                    className="library-button library-button--ink"
                   >
                     Delete
                   </button>
