@@ -57,6 +57,7 @@
     0 24px 60px rgba(41, 35, 29, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(8px);
+  font-family: var(--sans);
 }
 
 .auth-card__eyebrow {
@@ -66,23 +67,27 @@
   border: 1px solid rgba(26, 26, 26, 0.1);
   background: rgba(255, 255, 255, 0.75);
   padding: 6px 12px;
-  font-size: 12px;
+  font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(26, 26, 26, 0.68);
 }
 
 .auth-card__title {
-  margin: 18px 0 8px;
+  margin: 10px 0 14px;
   font-size: clamp(2.1rem, 4vw, 3rem);
   line-height: 1;
   letter-spacing: 0;
+  font-weight: 300;
+  font-family: var(--auth-font);
   color: #171412;
 }
 
 .auth-card__description {
   margin-bottom: 28px;
-  font-size: 0.98rem;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  font-weight: 300;
   color: rgba(23, 20, 18, 0.68);
 }
 
@@ -99,8 +104,8 @@
 .auth-field__label {
   display: inline-block;
   margin-bottom: 9px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.78rem;
+  font-weight: 400;
   letter-spacing: 0.02em;
   color: rgba(23, 20, 18, 0.82);
 }
@@ -112,6 +117,8 @@
   background: rgba(255, 255, 255, 0.88);
   padding: 14px 16px;
   font: inherit;
+  font-size: 0.9rem;
+  font-weight: 300;
   color: #171412;
   box-sizing: border-box;
   transition:
@@ -137,8 +144,8 @@
   padding: 14px 18px;
   border: 1.5px solid transparent;
   font: inherit;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 0.86rem;
+  font-weight: 400;
   cursor: pointer;
   transition:
     transform 0.18s ease,

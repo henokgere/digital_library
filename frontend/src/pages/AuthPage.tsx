@@ -14,7 +14,7 @@ export function AuthPage({
   onNavigate: (path: RoutePath) => void
 }) {
   return (
-    <div className="auth-page">
+    <div className="auth-page max-h-screen overflow-hidden">
       <div className="auth-page__cloud auth-page__cloud--top" aria-hidden="true">
         <svg viewBox="0 0 220 90" fill="none">
           <path
