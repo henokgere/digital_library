@@ -1,0 +1,75 @@
+@model IEnumerable<digital_library.Models.Book>
+@{
+    ViewData["Title"] = "Books";
+}
+
+@if (!Model.Any())
+{
+    <section class="library-empty-state">
+        <h2 class="library-empty-state__title">No books on the shelf yet</h2>
+        <p class="library-empty-state__text">
+            Start your collection with a first title, then this home view becomes your working catalog.
+        </p>
+        <a asp-action="AddBook" class="library-button library-button--primary">Add the First Book</a>
+    </section>
+}
+else
+{
+    <section class="library-grid">
+        @foreach (var book in Model)
+        {
+            <article class="book-card">
+                <div class="book-card__content">
+                    <div class="book-card__meta">
+                        <div class="book-card__header">
+                            <span class="book-card__chip">@book.Genre</span>
+                            <span class="book-card__year">@book.PublicationDate.Year</span>
+                        </div>
+                        <h2 class="book-card__title">@book.Title</h2>
+                        <p class="book-card__author">@(string.IsNullOrWhiteSpace(book.Author) ? "Author not listed" : $"by {book.Author}")</p>
+                        <p class="book-card__status @(book.AvailabilityStatus == digital_library.Models.AvailabilityStatus.Available ? "book-card__status--available" : "book-card__status--borrowed")">
+                            @(book.AvailabilityStatus == digital_library.Models.AvailabilityStatus.Available ? "Available now" : "Currently borrowed")
+                        </p>
+                        @if (book.AvailabilityStatus == digital_library.Models.AvailabilityStatus.Borrowed && !string.IsNullOrWhiteSpace(book.BorrowedBy))
+                        {
+                            <p class="book-card__borrowed-note">
+                                Borrowed by @book.BorrowedBy on @book.BorrowedDate?.ToString("MMM d, yyyy")
+                            </p>
+                        }
+                    </div>
+                    <div class="book-card__controls">
+                        @if (book.AvailabilityStatus == digital_library.Models.AvailabilityStatus.Available)
+                        {
+                            <form asp-action="Borrow" method="post" class="book-card__borrow-form">
+                                <input type="hidden" name="id" value="@book.Id" />
+                                <input type="text" name="borrowUser" placeholder="Who is borrowing it?" class="library-input" required />
+                                <button type="submit" class="library-button library-button--primary">Borrow</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="Return" method="post" class="book-card__borrow-form">
+                                <input type="hidden" name="id" value="@book.Id" />
+                                <button type="submit" class="library-button library-button--primary">Return</button>
+                            </form>
+                        }
+                        <div class="book-card__button-row">
+                            <a asp-action="Details" asp-route-id="@book.Id" class="library-button library-button--secondary">View</a>
+                            @if (book.AvailabilityStatus == digital_library.Models.AvailabilityStatus.Borrowed)
+                            {
+                                <span class="library-button library-button--muted library-button--disabled" aria-disabled="true">Edit</span>
+                            }
+                            else
+                            {
+                                <a asp-action="Edit" asp-route-id="@book.Id" class="library-button library-button--muted">Edit</a>
+                            }
+                            <a asp-action="Delete" asp-route-id="@book.Id" class="library-button library-button--danger">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        }
+    </section>
+}
+
+<a asp-action="AddBook" class="library-button library-button--secondary">Add Book</a>

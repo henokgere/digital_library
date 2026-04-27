@@ -1,21 +1,12 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using digital_library.Models;
 
 namespace digital_library.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
-    {
-        _logger = logger;
-    }
-
     public IActionResult Index()
     {
-        return View();
+        return RedirectToAction("Index", "Book");
     }
 
     public IActionResult Privacy()
@@ -23,9 +14,9 @@ public class HomeController : Controller
         return View();
     }
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
+    public IActionResult Logout()
     {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        TempData["StatusMessage"] = "You have been logged out.";
+        return RedirectToAction("Index", "Book");
     }
 }

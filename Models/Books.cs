@@ -3,6 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace digital_library.Models;
 
+public enum AvailabilityStatus
+{
+    Available,
+    Borrowed
+}
+
 public class Book
 {
     public int Id { get; set; }
@@ -12,6 +18,7 @@ public class Book
     public string? Genre { get; set; }
     [DefaultValue(0)]
     public DateTime PublicationDate { get; set; }
-    [DefaultValue(true)]  
-    public required Enum AvailabilityStatus { get; set; }
+    public AvailabilityStatus AvailabilityStatus { get; set; }
+    public string? BorrowedBy { get; set; }
+    public DateTime? BorrowedDate { get; set; }
 }

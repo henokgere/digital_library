@@ -1,0 +1,44 @@
+@model digital_library.Models.Book
+@{
+    ViewData["Title"] = "Book Details";
+}
+
+<section class="book-panel">
+    <div class="book-panel__header">
+        <div>
+            <p class="book-panel__eyebrow">Book View</p>
+            <h1 class="book-panel__title">@Model.Title</h1>
+            <p class="book-panel__subtitle">@(string.IsNullOrWhiteSpace(Model.Author) ? "Author not listed" : Model.Author)</p>
+        </div>
+        <span class="book-detail-status @(Model.AvailabilityStatus == digital_library.Models.AvailabilityStatus.Available ? "book-detail-status--available" : "book-detail-status--borrowed")">
+            @Model.AvailabilityStatus
+        </span>
+    </div>
+
+    <dl class="book-detail-grid">
+        <div class="book-detail-item">
+            <dt>Genre</dt>
+            <dd>@(string.IsNullOrWhiteSpace(Model.Genre) ? "Uncategorized" : Model.Genre)</dd>
+        </div>
+        <div class="book-detail-item">
+            <dt>Published</dt>
+            <dd>@Model.PublicationDate.ToString("MMMM d, yyyy")</dd>
+        </div>
+        <div class="book-detail-item">
+            <dt>Borrower</dt>
+            <dd>@(string.IsNullOrWhiteSpace(Model.BorrowedBy) ? "On shelf" : Model.BorrowedBy)</dd>
+        </div>
+        <div class="book-detail-item">
+            <dt>Borrowed On</dt>
+            <dd>@(Model.BorrowedDate?.ToString("MMMM d, yyyy") ?? "Not borrowed")</dd>
+        </div>
+    </dl>
+
+    <div class="book-form__actions">
+        @if (Model.AvailabilityStatus == digital_library.Models.AvailabilityStatus.Available)
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="library-button library-button--muted">Edit</a>
+        }
+        <a asp-action="Index" class="library-button library-button--secondary">Back to Catalog</a>
+    </div>
+</section>

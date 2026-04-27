@@ -1,0 +1,51 @@
+@model digital_library.Models.Book
+@{
+    ViewData["Title"] = "Edit Book";
+}
+
+<section class="book-panel">
+    <div class="book-panel__header">
+        <div>
+            <p class="book-panel__eyebrow">Edit Entry</p>
+            <h1 class="book-panel__title">Update @Model.Title</h1>
+            <p class="book-panel__subtitle">Refine the catalog details while the book is on the shelf.</p>
+        </div>
+    </div>
+
+    <form asp-action="Edit" method="post" class="book-form">
+        <input type="hidden" asp-for="Id" />
+        <div asp-validation-summary="ModelOnly" class="book-form__summary"></div>
+        <div class="book-form__grid">
+            <div class="book-form__field">
+                <label asp-for="Title"></label>
+                <input asp-for="Title" class="library-input" />
+                <span asp-validation-for="Title" class="book-form__error"></span>
+            </div>
+            <div class="book-form__field">
+                <label asp-for="Author"></label>
+                <input asp-for="Author" class="library-input" />
+                <span asp-validation-for="Author" class="book-form__error"></span>
+            </div>
+            <div class="book-form__field">
+                <label asp-for="Genre"></label>
+                <input asp-for="Genre" class="library-input" />
+                <span asp-validation-for="Genre" class="book-form__error"></span>
+            </div>
+            <div class="book-form__field">
+                <label asp-for="PublicationDate"></label>
+                <input asp-for="PublicationDate" class="library-input" type="date" />
+                <span asp-validation-for="PublicationDate" class="book-form__error"></span>
+            </div>
+        </div>
+        <div class="book-form__actions">
+            <button type="submit" class="library-button library-button--primary">Save Changes</button>
+            <a asp-action="Index" class="library-button library-button--secondary">Cancel</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

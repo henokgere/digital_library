@@ -92,7 +92,6 @@
 /home/henokg/digital_library/obj/Debug/net10.0/scopedcss/Views/Shared/_Layout.cshtml.rz.scp.css
 /home/henokg/digital_library/obj/Debug/net10.0/scopedcss/bundle/digital_library.styles.css
 /home/henokg/digital_library/obj/Debug/net10.0/scopedcss/projectbundle/digital_library.bundle.scp.css
-/home/henokg/digital_library/obj/Debug/net10.0/compressed/5imvoiejcp-{0}-fosamezn9b-fosamezn9b.gz
 /home/henokg/digital_library/obj/Debug/net10.0/compressed/kc84nm4wpr-{0}-61n19gt1b8-61n19gt1b8.gz
 /home/henokg/digital_library/obj/Debug/net10.0/compressed/ia6snw6uoh-{0}-fr7q2aak1r-fr7q2aak1r.gz
 /home/henokg/digital_library/obj/Debug/net10.0/compressed/kakxzr2sty-{0}-agp80tu62r-agp80tu62r.gz
@@ -164,3 +163,4 @@
 /home/henokg/digital_library/obj/Debug/net10.0/digital_library.pdb
 /home/henokg/digital_library/obj/Debug/net10.0/digital_library.genruntimeconfig.cache
 /home/henokg/digital_library/obj/Debug/net10.0/ref/digital_library.dll
+/home/henokg/digital_library/obj/Debug/net10.0/compressed/5imvoiejcp-{0}-mkeg2ctejl-mkeg2ctejl.gz

@@ -6,39 +6,35 @@
     <title>@ViewData["Title"] - Digital Library</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/MvcMovie.styles.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="HelloWorld" asp-action="Index">Digital library</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="HelloWorld" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+<body class="library-shell">
+    <header class="library-topbar">
+        <div class="library-topbar__inner">
+            <a class="library-brand" asp-area="" asp-controller="Book" asp-action="Index">
+                <span class="library-brand__eyebrow">Digital Library</span>
+                <span class="library-brand__title">Shelf & Story</span>
+            </a>
+            <nav class="library-nav" aria-label="Primary">
+                <a class="library-nav__link" asp-area="" asp-controller="Book" asp-action="Index">Home</a>
+                <a class="library-nav__link" asp-area="" asp-controller="Book" asp-action="AddBook">Add Book</a>
+                <a class="library-nav__link" asp-area="" asp-controller="Home" asp-action="Logout">Logout</a>
+            </nav>
+        </div>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div class="library-page">
+        <main role="main" class="library-main">
+            @if (TempData["StatusMessage"] is string statusMessage)
+            {
+                <div class="library-flash" role="status">@statusMessage</div>
+            }
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - Digital Library - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="library-footer">
+        <div class="library-footer__inner">
+            <span>&copy; 2026 Digital Library</span>
+            <a asp-area="" asp-controller="Book" asp-action="Index">Home</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.js"></script>

@@ -1,72 +1,118 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using digital_library.Models;
 
 namespace digital_library.Controllers
 {
     public class BookController : Controller
     {
-        private readonly digital_library.Data.digital_librsryContext _context;
+        private static readonly List<Book> Books =
+        [
+            new Book
+            {
+                Id = 1,
+                Title = "The Pragmatic Programmer",
+                Author = "Andrew Hunt and David Thomas",
+                Genre = "Software Engineering",
+                PublicationDate = new DateTime(1999, 10, 30),
+                AvailabilityStatus = AvailabilityStatus.Available
+            },
+            new Book
+            {
+                Id = 2,
+                Title = "Clean Code",
+                Author = "Robert C. Martin",
+                Genre = "Programming",
+                PublicationDate = new DateTime(2008, 8, 1),
+                AvailabilityStatus = AvailabilityStatus.Borrowed,
+                BorrowedBy = "Alem",
+                BorrowedDate = DateTime.Today.AddDays(-3)
+            }
+        ];
 
-        public BookController(digital_library.Data.digital_librsryContext context)
-        {
-            _context = context;
-        }
+        private static int _nextId = Books.Max(book => book.Id) + 1;
 
         // GET: Book
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.Book.ToListAsync());
+            return View(Books.OrderBy(book => book.Title).ToList());
         }
 
         // GET: Book/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-
-            var book = await _context.Book
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var book = Books.FirstOrDefault(m => m.Id == id);
             if (book == null)
             {
                 return NotFound();
             }
-
             return View(book);
         }
 
-        // GET: Book/Create
-        public IActionResult Create()
+        // GET: Book/AddBook
+        public IActionResult AddBook()
         {
             return View();
         }
 
-        // POST: Book/Create
+        // POST: Book/AddBook
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Author,Genre,PublicationDate,AvailabilityStatus")] Book book)
+        public IActionResult AddBook([Bind("Title,Author,Genre,PublicationDate")] Book book)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(book);
-                await _context.SaveChangesAsync();
+                book.Id = _nextId++;
+                book.AvailabilityStatus = AvailabilityStatus.Available;
+                Books.Add(book);
                 return RedirectToAction(nameof(Index));
             }
             return View(book);
         }
 
+        // POST: Book/Borrow
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Borrow(int id, string borrowUser)
+        {
+            var book = Books.FirstOrDefault(candidate => candidate.Id == id);
+            if (book == null || book.AvailabilityStatus != AvailabilityStatus.Available)
+            {
+                return NotFound();
+            }
+            book.AvailabilityStatus = AvailabilityStatus.Borrowed;
+            book.BorrowedBy = borrowUser;
+            book.BorrowedDate = DateTime.Now;
+            return RedirectToAction(nameof(Index));
+        }
+
+        // POST: Book/Return
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Return(int id)
+        {
+            var book = Books.FirstOrDefault(candidate => candidate.Id == id);
+            if (book == null || book.AvailabilityStatus != AvailabilityStatus.Borrowed)
+            {
+                return NotFound();
+            }
+            book.AvailabilityStatus = AvailabilityStatus.Available;
+            book.BorrowedBy = null;
+            book.BorrowedDate = null;
+            return RedirectToAction(nameof(Index));
+        }
+
         // GET: Book/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public IActionResult Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-
-            var book = await _context.Book.FindAsync(id);
+            var book = Books.FirstOrDefault(candidate => candidate.Id == id);
             if (book == null)
             {
                 return NotFound();
@@ -77,71 +123,62 @@ namespace digital_library.Controllers
         // POST: Book/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Author,Genre,PublicationDate,AvailabilityStatus")] Book book)
+        public IActionResult Edit(int id, [Bind("Id,Title,Author,Genre,PublicationDate,AvailabilityStatus")] Book book)
         {
             if (id != book.Id)
             {
                 return NotFound();
             }
-
             if (ModelState.IsValid)
             {
-                try
+                var existingBook = Books.FirstOrDefault(candidate => candidate.Id == id);
+                if (existingBook == null)
                 {
-                    _context.Update(book);
-                    await _context.SaveChangesAsync();
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BookExists(book.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+
+                existingBook.Title = book.Title;
+                existingBook.Author = book.Author;
+                existingBook.Genre = book.Genre;
+                existingBook.PublicationDate = book.PublicationDate;
+                existingBook.AvailabilityStatus = book.AvailabilityStatus;
+
                 return RedirectToAction(nameof(Index));
             }
             return View(book);
         }
 
         // GET: Book/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public IActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-
-            var book = await _context.Book
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var book = Books.FirstOrDefault(m => m.Id == id);
             if (book == null)
             {
                 return NotFound();
             }
-
             return View(book);
         }
 
         // POST: Book/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public IActionResult DeleteConfirmed(int id)
         {
-            var book = await _context.Book.FindAsync(id);
+            var book = Books.FirstOrDefault(candidate => candidate.Id == id);
             if (book != null)
             {
-                _context.Book.Remove(book);
+                Books.Remove(book);
             }
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool BookExists(int id)
         {
-            return _context.Book.Any(e => e.Id == id);
+            return Books.Any(e => e.Id == id);
         }
     }
 }

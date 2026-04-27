@@ -1,0 +1,22 @@
+@model digital_library.Models.Book
+@{
+    ViewData["Title"] = "Delete Book";
+}
+
+<section class="book-panel book-panel--danger">
+    <div class="book-panel__header">
+        <div>
+            <p class="book-panel__eyebrow">Remove Entry</p>
+            <h1 class="book-panel__title">Delete this book?</h1>
+            <p class="book-panel__subtitle">
+                <strong>@Model.Title</strong> by @(string.IsNullOrWhiteSpace(Model.Author) ? "Unknown author" : Model.Author) will be removed from the catalog.
+            </p>
+        </div>
+    </div>
+
+    <form asp-action="Delete" method="post" class="book-form__actions">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="library-button library-button--danger">Delete Book</button>
+        <a asp-action="Index" class="library-button library-button--secondary">Cancel</a>
+    </form>
+</section>
