@@ -1,4 +1,15 @@
+using Library.API.Models;
+using Library.API.Services;
+using Library.API.Settings;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<MongoDbSettings>(
+    builder.Configuration.GetSection(MongoDbSettings.SectionName));
+builder.Services.AddSingleton<BookService>();
+builder.Services.AddSingleton<UserService>();
+builder.Services.AddSingleton<LibrarySeeder>();
+builder.Services.AddSingleton<PasswordService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -19,18 +30,13 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseCors();
 
-var users = new List<User>
-{
-    new User { Username = "admin", Password = "password" }
-};
-var tokens = new Dictionary<string, string>();
+var tokens = new Dictionary<string, string>(StringComparer.Ordinal);
 
-var books = new List<Book>
+using (var scope = app.Services.CreateScope())
 {
-    new Book { Id = 1, Title = "The Hobbit", Author = "J.R.R. Tolkien", Status = "available" },
-    new Book { Id = 2, Title = "Clean Code", Author = "Robert C. Martin", Status = "available" }
-};
-var nextId = 3;
+    var seeder = scope.ServiceProvider.GetRequiredService<LibrarySeeder>();
+    await seeder.SeedAsync();
+}
 
 bool TryGetUsername(HttpRequest request, out string? username)
 {
@@ -52,16 +58,26 @@ bool TryGetUsername(HttpRequest request, out string? username)
 
 app.MapGet("/", () => "Library API is running. Use /auth/login or /auth/register and /books endpoint.");
 
-app.MapPost("/auth/register", (UserInput input) =>
+app.MapPost("/auth/register", async (UserInput input, UserService userService, PasswordService passwordService) =>
 {
     if (string.IsNullOrWhiteSpace(input.Username) || string.IsNullOrWhiteSpace(input.Password))
+    {
         return Results.BadRequest("Username and password are required.");
+    }
 
-    if (users.Any(u => u.Username.Equals(input.Username, StringComparison.OrdinalIgnoreCase)))
+    var existingUser = await userService.GetByUsernameAsync(input.Username);
+    if (existingUser is not null)
+    {
         return Results.Conflict("Username already exists.");
+    }
 
-    var user = new User { Username = input.Username!, Password = input.Password! };
-    users.Add(user);
+    var user = new User
+    {
+        Username = input.Username.Trim(),
+        PasswordHash = passwordService.HashPassword(input.Password)
+    };
+
+    await userService.CreateAsync(user);
 
     var token = Guid.NewGuid().ToString();
     tokens[token] = user.Username;
@@ -69,14 +85,18 @@ app.MapPost("/auth/register", (UserInput input) =>
     return Results.Ok(new AuthResponse { Token = token, Username = user.Username });
 });
 
-app.MapPost("/auth/login", (UserInput input) =>
+app.MapPost("/auth/login", async (UserInput input, UserService userService, PasswordService passwordService) =>
 {
     if (string.IsNullOrWhiteSpace(input.Username) || string.IsNullOrWhiteSpace(input.Password))
+    {
         return Results.BadRequest("Username and password are required.");
+    }
 
-    var user = users.FirstOrDefault(u => u.Username.Equals(input.Username, StringComparison.OrdinalIgnoreCase) && u.Password == input.Password);
-    if (user is null)
+    var user = await userService.GetByUsernameAsync(input.Username);
+    if (user is null || !passwordService.VerifyPassword(user, input.Password))
+    {
         return Results.Unauthorized();
+    }
 
     var token = Guid.NewGuid().ToString();
     tokens[token] = user.Username;
@@ -84,152 +104,167 @@ app.MapPost("/auth/login", (UserInput input) =>
     return Results.Ok(new AuthResponse { Token = token, Username = user.Username });
 });
 
-app.MapGet("/auth/me", (HttpRequest request) =>
+app.MapGet("/auth/me", async (HttpRequest request, UserService userService) =>
 {
-    if (!TryGetUsername(request, out var username))
+    if (!TryGetUsername(request, out var username) || string.IsNullOrWhiteSpace(username))
+    {
         return Results.Unauthorized();
+    }
 
-    return Results.Ok(new { Username = username });
+    var user = await userService.GetByUsernameAsync(username);
+    return user is null ? Results.Unauthorized() : Results.Ok(new { Username = user.Username });
 });
 
-app.MapGet("/books", (HttpRequest request) =>
+app.MapGet("/books", async (HttpRequest request, BookService bookService) =>
 {
     if (!TryGetUsername(request, out _))
+    {
         return Results.Unauthorized();
+    }
 
+    var books = await bookService.GetAsync();
     return Results.Ok(books);
 });
 
-app.MapGet("/books/{id:int}", (HttpRequest request, int id) =>
+app.MapGet("/books/{id}", async (HttpRequest request, string id, BookService bookService) =>
 {
     if (!TryGetUsername(request, out _))
+    {
         return Results.Unauthorized();
+    }
 
-    var book = books.FirstOrDefault(b => b.Id == id);
+    var book = await bookService.GetAsync(id);
     return book is null ? Results.NotFound() : Results.Ok(book);
 });
 
-app.MapPost("/books", (HttpRequest request, BookInput input) =>
+app.MapPost("/books", async (HttpRequest request, BookInput input, BookService bookService) =>
 {
     if (!TryGetUsername(request, out _))
+    {
         return Results.Unauthorized();
+    }
 
     if (string.IsNullOrWhiteSpace(input.Title) || string.IsNullOrWhiteSpace(input.Author))
+    {
         return Results.BadRequest("Title and Author are required.");
+    }
 
-    var book = new Book { Id = nextId++, Title = input.Title, Author = input.Author, Status = "available" };
-    books.Add(book);
+    var book = new Book
+    {
+        Title = input.Title.Trim(),
+        Author = input.Author.Trim(),
+        Status = "available"
+    };
+
+    await bookService.CreateAsync(book);
     return Results.Created($"/books/{book.Id}", book);
 });
 
-app.MapPut("/books/{id:int}", (HttpRequest request, int id, BookInput input) =>
+app.MapPut("/books/{id}", async (HttpRequest request, string id, BookInput input, BookService bookService) =>
 {
     if (!TryGetUsername(request, out _))
+    {
         return Results.Unauthorized();
+    }
 
-    var book = books.FirstOrDefault(b => b.Id == id);
+    var book = await bookService.GetAsync(id);
     if (book is null)
+    {
         return Results.NotFound();
+    }
 
     if (!string.IsNullOrWhiteSpace(input.Title))
-        book.Title = input.Title;
-    if (!string.IsNullOrWhiteSpace(input.Author))
-        book.Author = input.Author;
+    {
+        book.Title = input.Title.Trim();
+    }
 
+    if (!string.IsNullOrWhiteSpace(input.Author))
+    {
+        book.Author = input.Author.Trim();
+    }
+
+    await bookService.UpdateAsync(id, book);
     return Results.Ok(book);
 });
 
-app.MapDelete("/books/{id:int}", (HttpRequest request, int id) =>
+app.MapDelete("/books/{id}", async (HttpRequest request, string id, BookService bookService) =>
 {
     if (!TryGetUsername(request, out _))
+    {
         return Results.Unauthorized();
+    }
 
-    var book = books.FirstOrDefault(b => b.Id == id);
+    var book = await bookService.GetAsync(id);
     if (book is null)
+    {
         return Results.NotFound();
+    }
 
-    books.Remove(book);
+    await bookService.RemoveAsync(id);
     return Results.NoContent();
 });
 
-app.MapPost("/books/{id:int}/borrow", (HttpRequest request, int id, BorrowInput input) =>
+app.MapPost("/books/{id}/borrow", async (HttpRequest request, string id, BorrowInput input, BookService bookService, UserService userService) =>
 {
     if (!TryGetUsername(request, out _))
+    {
         return Results.Unauthorized();
+    }
 
-    var book = books.FirstOrDefault(b => b.Id == id);
+    var book = await bookService.GetAsync(id);
     if (book is null)
+    {
         return Results.NotFound();
+    }
 
     if (book.Status != "available")
+    {
         return Results.BadRequest("Book is not available for borrowing.");
+    }
 
     if (string.IsNullOrWhiteSpace(input.User))
+    {
         return Results.BadRequest("User is required.");
+    }
+
+    var borrower = await userService.GetByUsernameAsync(input.User);
+    if (borrower is null)
+    {
+        return Results.BadRequest("Borrowing user does not exist.");
+    }
 
     book.Status = "borrowed";
-    book.BorrowedBy = input.User;
+    book.BorrowedBy = borrower.Username;
     book.BorrowedDate = DateTime.UtcNow;
 
+    await bookService.UpdateAsync(id, book);
     return Results.Ok(book);
 });
 
-app.MapPost("/books/{id:int}/return", (HttpRequest request, int id) =>
+app.MapPost("/books/{id}/return", async (HttpRequest request, string id, BookService bookService) =>
 {
     if (!TryGetUsername(request, out _))
+    {
         return Results.Unauthorized();
+    }
 
-    var book = books.FirstOrDefault(b => b.Id == id);
+    var book = await bookService.GetAsync(id);
     if (book is null)
+    {
         return Results.NotFound();
+    }
 
     if (book.Status != "borrowed")
+    {
         return Results.BadRequest("Book is not borrowed.");
+    }
 
     book.Status = "available";
     book.BorrowedBy = null;
     book.BorrowedDate = null;
 
+    await bookService.UpdateAsync(id, book);
     return Results.Ok(book);
 });
 
 app.Run();
-
-public class Book
-{
-    public int Id { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public string Author { get; set; } = string.Empty;
-    public string Status { get; set; } = "available";
-    public string? BorrowedBy { get; set; }
-    public DateTime? BorrowedDate { get; set; }
-}
-
-public class BookInput
-{
-    public string? Title { get; set; }
-    public string? Author { get; set; }
-}
-
-public class BorrowInput
-{
-    public string? User { get; set; }
-}
-
-public class User
-{
-    public string Username { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
-}
-
-public class UserInput
-{
-    public string? Username { get; set; }
-    public string? Password { get; set; }
-}
-
-public class AuthResponse
-{
-    public string Token { get; set; } = string.Empty;
-    public string Username { get; set; } = string.Empty;
-}

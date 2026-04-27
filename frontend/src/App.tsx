@@ -158,7 +158,7 @@ function App() {
     }
   }
 
-  const updateBook = async (id: number, title: string, author: string) => {
+  const updateBook = async (id: string, title: string, author: string) => {
     try {
       const response = await fetchWithAuth(`${API_BASE}/books/${id}`, {
         method: 'PUT',
@@ -174,7 +174,7 @@ function App() {
     }
   }
 
-  const deleteBook = async (id: number) => {
+  const deleteBook = async (id: string) => {
     try {
       const response = await fetchWithAuth(`${API_BASE}/books/${id}`, {
         method: 'DELETE',
@@ -187,7 +187,7 @@ function App() {
     }
   }
 
-  const borrowBook = async (id: number, user: string) => {
+  const borrowBook = async (id: string, user: string) => {
     try {
       const borrower = user || auth?.username || ''
       const response = await fetchWithAuth(`${API_BASE}/books/${id}/borrow`, {
@@ -206,7 +206,7 @@ function App() {
     }
   }
 
-  const returnBook = async (id: number) => {
+  const returnBook = async (id: string) => {
     try {
       const response = await fetchWithAuth(`${API_BASE}/books/${id}/return`, {
         method: 'POST',

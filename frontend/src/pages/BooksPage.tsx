@@ -16,10 +16,10 @@ export function BooksPage({
   borrowUser: string
   setBorrowUser: (value: string) => void
   setEditing: (value: Book | null) => void
-  updateBook: (id: number, title: string, author: string) => Promise<void>
-  deleteBook: (id: number) => Promise<void>
-  borrowBook: (id: number, user: string) => Promise<void>
-  returnBook: (id: number) => Promise<void>
+  updateBook: (id: string, title: string, author: string) => Promise<void>
+  deleteBook: (id: string) => Promise<void>
+  borrowBook: (id: string, user: string) => Promise<void>
+  returnBook: (id: string) => Promise<void>
 }) {
   return (
     <div className="library-grid">
