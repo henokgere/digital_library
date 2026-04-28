@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="../build/digital_library.props" />
-</Project>

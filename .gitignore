@@ -1,1 +1,13 @@
 .codex
+
+# .NET build artifacts
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+
+# SQLite transient files
+*.db-shm
+*.db-wal

@@ -1,40 +1,23 @@
 using Microsoft.AspNetCore.Mvc;
+using digital_library.Data;
 using digital_library.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace digital_library.Controllers
 {
     public class BookController : Controller
     {
-        private static readonly List<Book> Books =
-        [
-            new Book
-            {
-                Id = 1,
-                Title = "The Pragmatic Programmer",
-                Author = "Andrew Hunt and David Thomas",
-                Genre = "Software Engineering",
-                PublicationDate = new DateTime(1999, 10, 30),
-                AvailabilityStatus = AvailabilityStatus.Available
-            },
-            new Book
-            {
-                Id = 2,
-                Title = "Clean Code",
-                Author = "Robert C. Martin",
-                Genre = "Programming",
-                PublicationDate = new DateTime(2008, 8, 1),
-                AvailabilityStatus = AvailabilityStatus.Borrowed,
-                BorrowedBy = "Alem",
-                BorrowedDate = DateTime.Today.AddDays(-3)
-            }
-        ];
+        private readonly digital_libraryContext _context;
 
-        private static int _nextId = Books.Max(book => book.Id) + 1;
+        public BookController(digital_libraryContext context)
+        {
+            _context = context;
+        }
 
         // GET: Book
         public IActionResult Index()
         {
-            return View(Books.OrderBy(book => book.Title).ToList());
+            return View(_context.Book.OrderBy(book => book.Title).ToList());
         }
 
         // GET: Book/Details/5
@@ -44,7 +27,7 @@ namespace digital_library.Controllers
             {
                 return NotFound();
             }
-            var book = Books.FirstOrDefault(m => m.Id == id);
+            var book = _context.Book.FirstOrDefault(m => m.Id == id);
             if (book == null)
             {
                 return NotFound();
@@ -65,9 +48,9 @@ namespace digital_library.Controllers
         {
             if (ModelState.IsValid)
             {
-                book.Id = _nextId++;
                 book.AvailabilityStatus = AvailabilityStatus.Available;
-                Books.Add(book);
+                _context.Book.Add(book);
+                _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
             return View(book);
@@ -78,7 +61,7 @@ namespace digital_library.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Borrow(int id, string borrowUser)
         {
-            var book = Books.FirstOrDefault(candidate => candidate.Id == id);
+            var book = _context.Book.FirstOrDefault(candidate => candidate.Id == id);
             if (book == null || book.AvailabilityStatus != AvailabilityStatus.Available)
             {
                 return NotFound();
@@ -86,6 +69,7 @@ namespace digital_library.Controllers
             book.AvailabilityStatus = AvailabilityStatus.Borrowed;
             book.BorrowedBy = borrowUser;
             book.BorrowedDate = DateTime.Now;
+            _context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
 
@@ -94,7 +78,7 @@ namespace digital_library.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Return(int id)
         {
-            var book = Books.FirstOrDefault(candidate => candidate.Id == id);
+            var book = _context.Book.FirstOrDefault(candidate => candidate.Id == id);
             if (book == null || book.AvailabilityStatus != AvailabilityStatus.Borrowed)
             {
                 return NotFound();
@@ -102,6 +86,7 @@ namespace digital_library.Controllers
             book.AvailabilityStatus = AvailabilityStatus.Available;
             book.BorrowedBy = null;
             book.BorrowedDate = null;
+            _context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
 
@@ -112,7 +97,7 @@ namespace digital_library.Controllers
             {
                 return NotFound();
             }
-            var book = Books.FirstOrDefault(candidate => candidate.Id == id);
+            var book = _context.Book.FirstOrDefault(candidate => candidate.Id == id);
             if (book == null)
             {
                 return NotFound();
@@ -131,7 +116,7 @@ namespace digital_library.Controllers
             }
             if (ModelState.IsValid)
             {
-                var existingBook = Books.FirstOrDefault(candidate => candidate.Id == id);
+                var existingBook = _context.Book.FirstOrDefault(candidate => candidate.Id == id);
                 if (existingBook == null)
                 {
                     return NotFound();
@@ -142,6 +127,7 @@ namespace digital_library.Controllers
                 existingBook.Genre = book.Genre;
                 existingBook.PublicationDate = book.PublicationDate;
                 existingBook.AvailabilityStatus = book.AvailabilityStatus;
+                _context.SaveChanges();
 
                 return RedirectToAction(nameof(Index));
             }
@@ -155,7 +141,7 @@ namespace digital_library.Controllers
             {
                 return NotFound();
             }
-            var book = Books.FirstOrDefault(m => m.Id == id);
+            var book = _context.Book.FirstOrDefault(m => m.Id == id);
             if (book == null)
             {
                 return NotFound();
@@ -168,17 +154,18 @@ namespace digital_library.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            var book = Books.FirstOrDefault(candidate => candidate.Id == id);
+            var book = _context.Book.FirstOrDefault(candidate => candidate.Id == id);
             if (book != null)
             {
-                Books.Remove(book);
+                _context.Book.Remove(book);
+                _context.SaveChanges();
             }
             return RedirectToAction(nameof(Index));
         }
 
         private bool BookExists(int id)
         {
-            return Books.Any(e => e.Id == id);
+            return _context.Book.Any(e => e.Id == id);
         }
     }
 }
