@@ -147,6 +147,38 @@ a {
   font-weight: 600;
 }
 
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.4rem 0;
+  color: var(--muted);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.google-button {
+  width: 100%;
+  gap: 0.75rem;
+  background: var(--paper-strong);
+  border: 1px solid rgba(35, 24, 21, 0.16);
+  color: var(--ink);
+}
+
+.google-button__icon {
+  flex-shrink: 0;
+}
+
 .library-flash {
   padding: 0.95rem 1.2rem;
   border: 1px solid rgba(37, 95, 75, 0.2);
@@ -532,3 +564,47 @@ a {
     padding-top: 1.5rem;
   }
 }
+
+.book-card__cover {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background: linear-gradient(160deg, #f4ead8, #d8c7a3);
+  overflow: hidden;
+}
+
+.book-card__cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.book-card__cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Georgia, serif;
+  font-size: 3.5rem;
+  color: rgba(63, 47, 28, 0.55);
+  font-weight: 600;
+}
+
+.book-panel__heading {
+  display: flex;
+  gap: 1.2rem;
+  align-items: flex-start;
+}
+
+.book-panel__cover {
+  width: 110px;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  flex-shrink: 0;
+}
+

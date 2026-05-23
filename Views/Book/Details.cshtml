@@ -5,10 +5,16 @@
 
 <section class="book-panel">
     <div class="book-panel__header">
-        <div>
-            <p class="book-panel__eyebrow">Book View</p>
-            <h1 class="book-panel__title">@Model.Title</h1>
-            <p class="book-panel__subtitle">@(string.IsNullOrWhiteSpace(Model.Author) ? "Author not listed" : Model.Author)</p>
+        <div class="book-panel__heading">
+            @if (!string.IsNullOrWhiteSpace(Model.CoverUrl))
+            {
+                <img src="@Model.CoverUrl" alt="Cover of @Model.Title" class="book-panel__cover" />
+            }
+            <div>
+                <p class="book-panel__eyebrow">Book View</p>
+                <h1 class="book-panel__title">@Model.Title</h1>
+                <p class="book-panel__subtitle">@(string.IsNullOrWhiteSpace(Model.Author) ? "Author not listed" : Model.Author)</p>
+            </div>
         </div>
         <span class="book-detail-status @(Model.AvailabilityStatus == digital_library.Models.AvailabilityStatus.Available ? "book-detail-status--available" : "book-detail-status--borrowed")">
             @Model.AvailabilityStatus

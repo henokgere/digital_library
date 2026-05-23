@@ -11,3 +11,8 @@ obj/
 # SQLite transient files
 *.db-shm
 *.db-wal
+
+# Local environment files (secrets) — keep .env.example tracked
+.env
+.env.*
+!.env.example

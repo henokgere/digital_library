@@ -2,6 +2,8 @@ using digital_library.Data;
 using digital_library.Models;
 using Microsoft.EntityFrameworkCore;
 
+LoadDotEnv(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<digital_libraryContext>(options =>
@@ -9,6 +11,9 @@ builder.Services.AddDbContext<digital_libraryContext>(options =>
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// HttpClient is used to call Google's OAuth token/userinfo endpoints.
+builder.Services.AddHttpClient();
 
 // Session is used to keep the signed-in user across requests.
 builder.Services.AddDistributedMemoryCache();
@@ -49,3 +54,27 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+// Loads KEY=VALUE pairs from a .env file into process env vars for local dev.
+// Real env vars (set by the OS or by Render) always win.
+static void LoadDotEnv(string path)
+{
+    if (!File.Exists(path)) return;
+
+    foreach (var raw in File.ReadAllLines(path))
+    {
+        var line = raw.Trim();
+        if (line.Length == 0 || line.StartsWith('#')) continue;
+
+        var eq = line.IndexOf('=');
+        if (eq <= 0) continue;
+
+        var key = line[..eq].Trim();
+        var value = line[(eq + 1)..].Trim().Trim('"', '\'');
+
+        if (Environment.GetEnvironmentVariable(key) is null)
+        {
+            Environment.SetEnvironmentVariable(key, value);
+        }
+    }
+}

@@ -19,6 +19,16 @@ else
         @foreach (var book in Model)
         {
             <article class="book-card">
+                <div class="book-card__cover">
+                    @if (!string.IsNullOrWhiteSpace(book.CoverUrl))
+                    {
+                        <img src="@book.CoverUrl" alt="Cover of @book.Title" class="book-card__cover-img" loading="lazy" />
+                    }
+                    else
+                    {
+                        <div class="book-card__cover-placeholder" aria-hidden="true">@(string.IsNullOrWhiteSpace(book.Title) ? "?" : book.Title.Substring(0, 1))</div>
+                    }
+                </div>
                 <div class="book-card__content">
                     <div class="book-card__meta">
                         <div class="book-card__header">

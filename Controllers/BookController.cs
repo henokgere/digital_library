@@ -44,7 +44,7 @@ namespace digital_library.Controllers
         // POST: Book/AddBook
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AddBook([Bind("Title,Author,Genre,PublicationDate")] Book book)
+        public IActionResult AddBook([Bind("Title,Author,Genre,PublicationDate,CoverUrl")] Book book)
         {
             if (ModelState.IsValid)
             {
@@ -108,7 +108,7 @@ namespace digital_library.Controllers
         // POST: Book/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, [Bind("Id,Title,Author,Genre,PublicationDate,AvailabilityStatus")] Book book)
+        public IActionResult Edit(int id, [Bind("Id,Title,Author,Genre,PublicationDate,AvailabilityStatus,CoverUrl")] Book book)
         {
             if (id != book.Id)
             {
@@ -127,6 +127,7 @@ namespace digital_library.Controllers
                 existingBook.Genre = book.Genre;
                 existingBook.PublicationDate = book.PublicationDate;
                 existingBook.AvailabilityStatus = book.AvailabilityStatus;
+                existingBook.CoverUrl = book.CoverUrl;
                 _context.SaveChanges();
 
                 return RedirectToAction(nameof(Index));

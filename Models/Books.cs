@@ -21,4 +21,6 @@ public class Book
     public AvailabilityStatus AvailabilityStatus { get; set; }
     public string? BorrowedBy { get; set; }
     public DateTime? BorrowedDate { get; set; }
+    [Display(Name = "Cover Image URL")]
+    public string? CoverUrl { get; set; }
 }

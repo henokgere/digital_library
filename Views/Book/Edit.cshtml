@@ -36,6 +36,11 @@
                 <input asp-for="PublicationDate" class="library-input" type="date" />
                 <span asp-validation-for="PublicationDate" class="book-form__error"></span>
             </div>
+            <div class="book-form__field">
+                <label asp-for="CoverUrl"></label>
+                <input asp-for="CoverUrl" class="library-input" type="url" placeholder="https://covers.openlibrary.org/b/isbn/…-L.jpg" />
+                <span asp-validation-for="CoverUrl" class="book-form__error"></span>
+            </div>
         </div>
         <div class="book-form__actions">
             <button type="submit" class="library-button library-button--primary">Save Changes</button>
