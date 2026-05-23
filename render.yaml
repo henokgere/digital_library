@@ -1,0 +1,23 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+# Commit this file; on Render choose "New +" -> "Blueprint" and point it at this repo.
+services:
+  - type: web
+    name: digital-library
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+
+    # SQLite data is lost on every deploy/restart unless stored on a disk.
+    # Disks require a paid instance type. To enable persistence:
+    #   1. Change `plan: free` above to a paid plan (e.g. `starter`).
+    #   2. Uncomment the block below.
+    #   3. Add an env var so the app writes the DB onto the disk, e.g.:
+    #        ConnectionStrings__digital_libraryContext=Data Source=/var/data/digital_library.db
+    #
+    # disk:
+    #   name: digital-library-data
+    #   mountPath: /var/data
+    #   sizeGB: 1

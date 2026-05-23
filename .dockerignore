@@ -1,0 +1,25 @@
+# Build artifacts
+**/bin/
+**/obj/
+
+# Git / IDE / tooling
+.git/
+.gitignore
+.vs/
+.vscode/
+.codex/
+*.user
+*.suo
+
+# Local SQLite database (recreated at startup by EF Core migrations)
+*.db
+*.db-shm
+*.db-wal
+
+# Files not needed inside the image
+Dockerfile
+.dockerignore
+dotnet-install.sh
+dotnet-runtime-*.tar.gz
+*.pdf
+README.md
