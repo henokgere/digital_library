@@ -104,9 +104,47 @@ a {
   transform: translateY(-1px);
 }
 
+.library-nav__user {
+  display: inline-flex;
+  align-items: center;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.75rem 0.5rem;
+  color: var(--ink);
+}
+
+.library-nav__logout {
+  margin: 0;
+}
+
+.library-nav__link--button {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+}
+
 .library-page {
   flex: 1;
   padding: 2.5rem 0 4rem;
+}
+
+.auth-panel {
+  width: min(460px, 100%);
+  margin: 0 auto;
+}
+
+.auth-switch {
+  margin: 1.5rem 0 0;
+  color: var(--muted);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.auth-switch a {
+  color: var(--accent);
+  font-weight: 600;
 }
 
 .library-flash {

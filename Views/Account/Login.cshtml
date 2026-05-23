@@ -1,0 +1,46 @@
+@model digital_library.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<section class="book-panel auth-panel">
+    <div class="book-panel__header">
+        <div>
+            <p class="book-panel__eyebrow">Welcome back</p>
+            <h1 class="book-panel__title">Sign in</h1>
+            <p class="book-panel__subtitle">Sign in to manage the library catalog.</p>
+        </div>
+    </div>
+
+    <form asp-controller="Account" asp-action="Login" method="post" class="book-form">
+        <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+        <div asp-validation-summary="ModelOnly" class="book-form__summary"></div>
+
+        <div class="book-form__field">
+            <label asp-for="UsernameOrEmail"></label>
+            <input asp-for="UsernameOrEmail" class="library-input" autocomplete="username" />
+            <span asp-validation-for="UsernameOrEmail" class="book-form__error"></span>
+        </div>
+
+        <div class="book-form__field">
+            <label asp-for="Password"></label>
+            <input asp-for="Password" class="library-input" autocomplete="current-password" />
+            <span asp-validation-for="Password" class="book-form__error"></span>
+        </div>
+
+        <div class="book-form__actions">
+            <button type="submit" class="library-button library-button--primary">Sign In</button>
+        </div>
+    </form>
+
+    <p class="auth-switch">
+        Don't have an account?
+        <a asp-controller="Account" asp-action="Register">Create one</a>
+    </p>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,22 +1,26 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace digital_library.Controllers;
 
 public class HomeController : Controller
 {
+    // GET: / or /Home/Index
     public IActionResult Index()
     {
-        return RedirectToAction("Index", "Book");
+        // Not signed in -> send the visitor to the login view.
+        if (HttpContext.Session.GetInt32("UserId") is null)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        // Signed in -> render the home view.
+        ViewData["Username"] = HttpContext.Session.GetString("Username");
+        return View();
     }
 
     public IActionResult Privacy()
     {
         return View();
-    }
-
-    public IActionResult Logout()
-    {
-        TempData["StatusMessage"] = "You have been logged out.";
-        return RedirectToAction("Index", "Book");
     }
 }

@@ -1,0 +1,57 @@
+@model digital_library.Models.RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<section class="book-panel auth-panel">
+    <div class="book-panel__header">
+        <div>
+            <p class="book-panel__eyebrow">New here</p>
+            <h1 class="book-panel__title">Create account</h1>
+            <p class="book-panel__subtitle">Set up an account to start lending books.</p>
+        </div>
+    </div>
+
+    <form asp-controller="Account" asp-action="Register" method="post" class="book-form">
+        <div asp-validation-summary="ModelOnly" class="book-form__summary"></div>
+
+        <div class="book-form__field">
+            <label asp-for="Username"></label>
+            <input asp-for="Username" class="library-input" autocomplete="username" />
+            <span asp-validation-for="Username" class="book-form__error"></span>
+        </div>
+
+        <div class="book-form__field">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" class="library-input" autocomplete="email" />
+            <span asp-validation-for="Email" class="book-form__error"></span>
+        </div>
+
+        <div class="book-form__field">
+            <label asp-for="Password"></label>
+            <input asp-for="Password" class="library-input" autocomplete="new-password" />
+            <span asp-validation-for="Password" class="book-form__error"></span>
+        </div>
+
+        <div class="book-form__field">
+            <label asp-for="ConfirmPassword"></label>
+            <input asp-for="ConfirmPassword" class="library-input" autocomplete="new-password" />
+            <span asp-validation-for="ConfirmPassword" class="book-form__error"></span>
+        </div>
+
+        <div class="book-form__actions">
+            <button type="submit" class="library-button library-button--primary">Create Account</button>
+        </div>
+    </form>
+
+    <p class="auth-switch">
+        Already have an account?
+        <a asp-controller="Account" asp-action="Login">Sign in</a>
+    </p>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,3 +1,18 @@
 @{
-    Layout = null;
+    ViewData["Title"] = "Home";
+    var username = ViewData["Username"] as string;
 }
+
+<section class="book-hero book-hero--compact">
+    <div class="book-hero__copy">
+        <p class="book-hero__eyebrow">Your library</p>
+        <h1 class="book-hero__title">Welcome@(string.IsNullOrEmpty(username) ? "" : ", " + username)</h1>
+        <p class="book-hero__text">
+            You're signed in. Browse the shelves, lend a title, or add a new arrival to the catalog.
+        </p>
+        <div class="book-hero__actions">
+            <a asp-controller="Book" asp-action="Index" class="library-button library-button--primary">Browse Catalog</a>
+            <a asp-controller="Book" asp-action="AddBook" class="library-button library-button--secondary">Add a Book</a>
+        </div>
+    </div>
+</section>
