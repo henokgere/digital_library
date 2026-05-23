@@ -43,7 +43,19 @@
     <div class="book-form__actions">
         @if (Model.AvailabilityStatus == digital_library.Models.AvailabilityStatus.Available)
         {
+            <form asp-action="Borrow" method="post" class="book-detail__borrow-form">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <input type="text" name="borrowUser" placeholder="Who is borrowing it?" class="library-input" required />
+                <button type="submit" class="library-button library-button--primary">Borrow</button>
+            </form>
             <a asp-action="Edit" asp-route-id="@Model.Id" class="library-button library-button--muted">Edit</a>
+        }
+        else
+        {
+            <form asp-action="Return" method="post">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="library-button library-button--primary">Return</button>
+            </form>
         }
         <a asp-action="Index" class="library-button library-button--secondary">Back to Catalog</a>
     </div>
