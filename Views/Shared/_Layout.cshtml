@@ -17,7 +17,12 @@
                 <span class="library-brand__eyebrow">Digital Library</span>
                 <span class="library-brand__title">Shelf & Story</span>
             </a>
-            <nav class="library-nav" aria-label="Primary">
+            <button type="button" class="library-nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
+                <span class="library-nav-toggle__bar"></span>
+                <span class="library-nav-toggle__bar"></span>
+                <span class="library-nav-toggle__bar"></span>
+            </button>
+            <nav id="primary-nav" class="library-nav" aria-label="Primary">
                 @if (currentUser is not null)
                 {
                     <a class="library-nav__link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
